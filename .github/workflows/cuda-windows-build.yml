@@ -288,6 +288,23 @@ jobs:
           python setup.py bdist_wheel --dist-dir=dist
 
       # ----------------------------------------------------------------
+      # Upload build logs on failure
+      # ----------------------------------------------------------------
+      - name: Upload build error logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-error-logs-cuda${{ env.CUDA_VERSION }}-py${{ env.PYTHON_VERSION }}
+          path: |
+            build/**/machete_generation.log
+            build/**/*.log
+            build/**/CMakeOutput.log
+            build/**/CMakeError.log
+            build/**/CMakeConfigureLog.yaml
+          if-no-files-found: ignore
+          retention-days: 7
+
+      # ----------------------------------------------------------------
       # Upload artifact
       # ----------------------------------------------------------------
       - name: Upload wheel artifact
