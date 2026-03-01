@@ -857,9 +857,16 @@ if(VLLM_GPU_LANG STREQUAL "CUDA")
 
     if (NOT DEFINED CACHE{MACHETE_GEN_SCRIPT_HASH}
         OR NOT $CACHE{MACHETE_GEN_SCRIPT_HASH} STREQUAL ${MACHETE_GEN_SCRIPT_HASH})
+      # Use platform-appropriate path separator for PYTHONPATH (; on Windows, : on Unix)
+      if(WIN32)
+        set(_PYPATH_SEP ";")
+      else()
+        set(_PYPATH_SEP ":")
+      endif()
+
       execute_process(
         COMMAND ${CMAKE_COMMAND} -E env
-        "PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}/csrc/cutlass_extensions/:${CUTLASS_DIR}/python/:${VLLM_PYTHON_PATH}:$ENV{PYTHONPATH}"
+        "PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}/csrc/cutlass_extensions/${_PYPATH_SEP}${CUTLASS_DIR}/python/${_PYPATH_SEP}${VLLM_PYTHON_PATH}${_PYPATH_SEP}$ENV{PYTHONPATH}"
           ${Python_EXECUTABLE} ${MACHETE_GEN_SCRIPT}
         RESULT_VARIABLE machete_generation_result
         OUTPUT_VARIABLE machete_generation_output
