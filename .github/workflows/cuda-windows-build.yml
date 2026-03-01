@@ -110,6 +110,117 @@ jobs:
           Write-Host "CUDA_HOME = $env:CUDA_HOME"
 
       # ----------------------------------------------------------------
+      # Install cuDNN from NVIDIA redistributable archives
+      # ----------------------------------------------------------------
+      - name: Install cuDNN
+        env:
+          CUDNN_INSTALL_DIR: "C:\\Program Files\\NVIDIA\\cuDNN"
+          CUDNN_REDIST_BASE: "https://developer.download.nvidia.com/compute/cudnn/redist"
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $archive = "cudnn/windows-x86_64/cudnn-windows-x86_64-9.19.1.2_cuda12-archive.zip"
+          $url = "$env:CUDNN_REDIST_BASE/$archive"
+          $fileName = Split-Path $archive -Leaf
+          $zipPath = Join-Path $env:RUNNER_TEMP $fileName
+          $extractDir = Join-Path $env:RUNNER_TEMP ($fileName -replace '\.zip$', '')
+
+          Write-Host "Downloading $fileName ..."
+          Invoke-WebRequest -Uri $url -OutFile $zipPath -MaximumRetryCount 3 -RetryIntervalSec 5
+
+          Write-Host "Extracting $fileName ..."
+          Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
+
+          $innerDir = Get-ChildItem -Path $extractDir -Directory | Select-Object -First 1
+          New-Item -ItemType Directory -Force -Path "$env:CUDNN_INSTALL_DIR" | Out-Null
+          Copy-Item -Path "$($innerDir.FullName)\*" -Destination "$env:CUDNN_INSTALL_DIR" -Recurse -Force
+
+          Remove-Item -Path $zipPath -Force
+          Remove-Item -Path $extractDir -Recurse -Force
+
+          Write-Host "cuDNN installed to $env:CUDNN_INSTALL_DIR"
+
+          echo "USE_CUDNN=1" >> $env:GITHUB_ENV
+          echo "CUDNN_LIBRARY_PATH=$env:CUDNN_INSTALL_DIR\lib" >> $env:GITHUB_ENV
+          echo "CUDNN_INCLUDE_PATH=$env:CUDNN_INSTALL_DIR\include" >> $env:GITHUB_ENV
+          echo "$env:CUDNN_INSTALL_DIR\bin" >> $env:GITHUB_PATH
+          echo "$env:CUDNN_INSTALL_DIR\lib" >> $env:GITHUB_PATH
+
+      # ----------------------------------------------------------------
+      # Install cuSPARSELt from NVIDIA redistributable archives
+      # ----------------------------------------------------------------
+      - name: Install cuSPARSELt
+        env:
+          CUSPARSELT_INSTALL_DIR: "C:\\Program Files\\NVIDIA\\cuSPARSELt"
+          CUSPARSELT_REDIST_BASE: "https://developer.download.nvidia.com/compute/cusparselt/redist"
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $archive = "libcusparse_lt/windows-x86_64/libcusparse_lt-windows-x86_64-0.8.1.1_cuda12-archive.zip"
+          $url = "$env:CUSPARSELT_REDIST_BASE/$archive"
+          $fileName = Split-Path $archive -Leaf
+          $zipPath = Join-Path $env:RUNNER_TEMP $fileName
+          $extractDir = Join-Path $env:RUNNER_TEMP ($fileName -replace '\.zip$', '')
+
+          Write-Host "Downloading $fileName ..."
+          Invoke-WebRequest -Uri $url -OutFile $zipPath -MaximumRetryCount 3 -RetryIntervalSec 5
+
+          Write-Host "Extracting $fileName ..."
+          Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
+
+          $innerDir = Get-ChildItem -Path $extractDir -Directory | Select-Object -First 1
+          New-Item -ItemType Directory -Force -Path "$env:CUSPARSELT_INSTALL_DIR" | Out-Null
+          Copy-Item -Path "$($innerDir.FullName)\*" -Destination "$env:CUSPARSELT_INSTALL_DIR" -Recurse -Force
+
+          Remove-Item -Path $zipPath -Force
+          Remove-Item -Path $extractDir -Recurse -Force
+
+          Write-Host "cuSPARSELt installed to $env:CUSPARSELT_INSTALL_DIR"
+
+          echo "USE_CUSPARSELT=1" >> $env:GITHUB_ENV
+          echo "CUSPARSELT_LIBRARY_PATH=$env:CUSPARSELT_INSTALL_DIR\lib" >> $env:GITHUB_ENV
+          echo "CUSPARSELT_INCLUDE_PATH=$env:CUSPARSELT_INSTALL_DIR\include" >> $env:GITHUB_ENV
+          echo "$env:CUSPARSELT_INSTALL_DIR\bin" >> $env:GITHUB_PATH
+          echo "$env:CUSPARSELT_INSTALL_DIR\lib" >> $env:GITHUB_PATH
+
+      # ----------------------------------------------------------------
+      # Install cuDSS from NVIDIA redistributable archives
+      # ----------------------------------------------------------------
+      - name: Install cuDSS
+        env:
+          CUDSS_INSTALL_DIR: "C:\\Program Files\\NVIDIA\\cuDSS"
+          CUDSS_REDIST_BASE: "https://developer.download.nvidia.com/compute/cudss/redist"
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $archive = "libcudss/windows-x86_64/libcudss-windows-x86_64-0.7.1.4_cuda12-archive.zip"
+          $url = "$env:CUDSS_REDIST_BASE/$archive"
+          $fileName = Split-Path $archive -Leaf
+          $zipPath = Join-Path $env:RUNNER_TEMP $fileName
+          $extractDir = Join-Path $env:RUNNER_TEMP ($fileName -replace '\.zip$', '')
+
+          Write-Host "Downloading $fileName ..."
+          Invoke-WebRequest -Uri $url -OutFile $zipPath -MaximumRetryCount 3 -RetryIntervalSec 5
+
+          Write-Host "Extracting $fileName ..."
+          Expand-Archive -Path $zipPath -DestinationPath $extractDir -Force
+
+          $innerDir = Get-ChildItem -Path $extractDir -Directory | Select-Object -First 1
+          New-Item -ItemType Directory -Force -Path "$env:CUDSS_INSTALL_DIR" | Out-Null
+          Copy-Item -Path "$($innerDir.FullName)\*" -Destination "$env:CUDSS_INSTALL_DIR" -Recurse -Force
+
+          Remove-Item -Path $zipPath -Force
+          Remove-Item -Path $extractDir -Recurse -Force
+
+          Write-Host "cuDSS installed to $env:CUDSS_INSTALL_DIR"
+
+          echo "USE_CUDSS=1" >> $env:GITHUB_ENV
+          echo "CUDSS_LIBRARY_PATH=$env:CUDSS_INSTALL_DIR\lib" >> $env:GITHUB_ENV
+          echo "CUDSS_INCLUDE_PATH=$env:CUDSS_INSTALL_DIR\include" >> $env:GITHUB_ENV
+          echo "$env:CUDSS_INSTALL_DIR\bin" >> $env:GITHUB_PATH
+          echo "$env:CUDSS_INSTALL_DIR\lib" >> $env:GITHUB_PATH
+
+      # ----------------------------------------------------------------
       # Set up Python
       # ----------------------------------------------------------------
       - name: Set up Python ${{ env.PYTHON_VERSION }}
