@@ -258,6 +258,16 @@ jobs:
         with:
           version: "v0.10.0"
 
+      - name: Verify sccache backend
+        run: |
+          sccache --start-server 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::warning::sccache server failed to start (GHAC may be unavailable). Building without compiler cache."
+            echo "VLLM_DISABLE_SCCACHE=1" >> $env:GITHUB_ENV
+          } else {
+            sccache --show-stats
+          }
+
       # ----------------------------------------------------------------
       # Install PyTorch (nightly with CUDA 12.6)
       # ----------------------------------------------------------------
