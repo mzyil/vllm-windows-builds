@@ -231,12 +231,19 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-          cache-dependency-path: |
-            requirements/build.txt
-            requirements/common.txt
-            requirements/cuda.txt
-            requirements/windows.txt
+
+      - name: Get pip cache dir
+        id: pip-cache
+        run: echo "dir=$(pip cache dir)" >> $env:GITHUB_OUTPUT
+
+      - name: Restore pip cache
+        id: restore-pip-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: pip-${{ runner.os }}-py${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements/build.txt', 'requirements/common.txt', 'requirements/cuda.txt', 'requirements/windows.txt') }}
+          restore-keys: |
+            pip-${{ runner.os }}-py${{ env.PYTHON_VERSION }}-
 
       # ----------------------------------------------------------------
       # Set up build tools
@@ -324,3 +331,13 @@ jobs:
           path: dist/*.whl
           if-no-files-found: error
           retention-days: 30
+
+      # ----------------------------------------------------------------
+      # Save pip cache (runs even on failure so next build has cached deps)
+      # ----------------------------------------------------------------
+      - name: Save pip cache
+        if: always() && steps.restore-pip-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: pip-${{ runner.os }}-py${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements/build.txt', 'requirements/common.txt', 'requirements/cuda.txt', 'requirements/windows.txt') }}
