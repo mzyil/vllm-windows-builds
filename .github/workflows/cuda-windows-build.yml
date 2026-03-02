@@ -274,6 +274,7 @@ jobs:
             echo "VLLM_DISABLE_SCCACHE=1" >> $env:GITHUB_ENV
             echo "SCCACHE_GHA_ENABLED=false" >> $env:GITHUB_ENV
           }
+          exit 0
 
       # ----------------------------------------------------------------
       # Install PyTorch (nightly with CUDA 12.6)
