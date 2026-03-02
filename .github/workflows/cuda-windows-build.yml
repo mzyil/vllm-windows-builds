@@ -260,12 +260,19 @@ jobs:
 
       - name: Verify sccache backend
         run: |
-          sccache --start-server 2>&1
-          if ($LASTEXITCODE -ne 0) {
+          $ok = $false
+          try {
+            $proc = Start-Process -FilePath sccache -ArgumentList '--start-server' -Wait -PassThru -NoNewWindow -RedirectStandardError "$env:RUNNER_TEMP\sccache_err.txt" 2>$null
+            if ($proc.ExitCode -eq 0) {
+              sccache --show-stats
+              $ok = $true
+            }
+          } catch { }
+          if (-not $ok) {
             Write-Host "::warning::sccache server failed to start (GHAC may be unavailable). Building without compiler cache."
+            sccache --stop-server 2>$null
             echo "VLLM_DISABLE_SCCACHE=1" >> $env:GITHUB_ENV
-          } else {
-            sccache --show-stats
+            echo "SCCACHE_GHA_ENABLED=false" >> $env:GITHUB_ENV
           }
 
       # ----------------------------------------------------------------
@@ -304,7 +311,7 @@ jobs:
           VLLM_TARGET_DEVICE: "cuda"
           MAX_JOBS: "2"
           CMAKE_BUILD_TYPE: "Release"
-          SCCACHE_GHA_ENABLED: "true"
+          SCCACHE_GHA_ENABLED: ${{ env.SCCACHE_GHA_ENABLED }}
         run: |
           # Load MSVC environment
           $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
