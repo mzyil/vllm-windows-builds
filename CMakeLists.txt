@@ -329,7 +329,7 @@ if(VLLM_GPU_LANG STREQUAL "CUDA")
     string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
 	string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-	string(APPEND CMAKE_CXX_FLAGS "/Zc:__cplusplus")
+	string(APPEND CMAKE_CXX_FLAGS " /Zc:__cplusplus")
 	set(CMAKE_CUDA_FLAGS_DEBUG "")
   endif()
 

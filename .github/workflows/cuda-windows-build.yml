@@ -58,7 +58,7 @@ jobs:
       # ----------------------------------------------------------------
       - name: Install CUDA Toolkit ${{ env.CUDA_VERSION }}
         env:
-          CUDA_INSTALL_DIR: "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v${{ env.CUDA_VERSION }}"
+          CUDA_INSTALL_DIR: "C:\\cuda\\v${{ env.CUDA_VERSION }}"
           CUDA_REDIST_BASE: "https://developer.download.nvidia.com/compute/cuda/redist"
         run: |
           $ErrorActionPreference = "Stop"
@@ -118,7 +118,7 @@ jobs:
       # ----------------------------------------------------------------
       - name: Install cuDNN
         env:
-          CUDNN_INSTALL_DIR: "C:\\Program Files\\NVIDIA\\cuDNN"
+          CUDNN_INSTALL_DIR: "C:\\nvidia\\cudnn"
           CUDNN_REDIST_BASE: "https://developer.download.nvidia.com/compute/cudnn/redist"
         run: |
           $ErrorActionPreference = "Stop"
@@ -155,7 +155,7 @@ jobs:
       # ----------------------------------------------------------------
       - name: Install cuSPARSELt
         env:
-          CUSPARSELT_INSTALL_DIR: "C:\\Program Files\\NVIDIA\\cuSPARSELt"
+          CUSPARSELT_INSTALL_DIR: "C:\\nvidia\\cusparselt"
           CUSPARSELT_REDIST_BASE: "https://developer.download.nvidia.com/compute/cusparselt/redist"
         run: |
           $ErrorActionPreference = "Stop"
@@ -192,7 +192,7 @@ jobs:
       # ----------------------------------------------------------------
       - name: Install cuDSS
         env:
-          CUDSS_INSTALL_DIR: "C:\\Program Files\\NVIDIA\\cuDSS"
+          CUDSS_INSTALL_DIR: "C:\\nvidia\\cudss"
           CUDSS_REDIST_BASE: "https://developer.download.nvidia.com/compute/cudss/redist"
         run: |
           $ErrorActionPreference = "Stop"
